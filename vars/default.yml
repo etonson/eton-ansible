@@ -1,0 +1,16 @@
+---
+# Git repositories (GitHub SSH URLs)
+dotfiles_repo: "git@github.com:etonson/eton-dotfiles.git"
+nvim_repo: "git@github.com:etonson/eton-nvim.git"
+
+# Local destinations
+dotfiles_dest_dir: "{{ ansible_user_dir }}/.dotfiles"
+nvim_dest_dir: "{{ ansible_user_dir }}/.config/nvim"
+
+# Zsh settings
+zsh_custom_dir: "{{ ansible_user_dir }}/.oh-my-zsh/custom"
+
+# Install optional runtimes
+install_bun: true
+install_podman: true
+
