@@ -1,0 +1,41 @@
+[user]
+	name = {{ git_user_name }}
+	email = {{ git_user_email }}
+[pull]
+	rebase = false
+[core]
+	autocrlf = input
+[alias]
+	lg = log --oneline --graph --decorate --all
+	extract = "!f() { \
+		commit=$1; \
+		target=$(readlink -f \"$2\"); \
+		mkdir -p \"$target\"; \
+		git diff-tree --no-commit-id --name-only -r -z --diff-filter=d \"$commit\" | \
+		xargs -0 -I{} cp --parents \"{}\" \"$target\"; \
+		echo \"Files from $commit extracted to $target\"; \
+	}; f"
+	savepoint = "!f() { \
+		name=${1:-savepoint}; \
+		ts=$(date +%Y%m%d-%H%M%S); \
+		git branch backup/$name-$ts; \
+		git push origin backup/$name-$ts; \
+		echo \"Backup branch pushed: backup/$name-$ts\"; \
+	}; f"
+	diff-da = "!f() { \
+		range=${1:-HEAD~1..HEAD}; \
+		git diff \"$range\" --name-status --find-renames | \
+		sed -E 's/^R[0-9]+[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)$/D\t\\1\\nA\t\\2/' | \
+		sort; \
+	}; f"
+	diff-da-file = "!f() { \
+		range=${1:-HEAD~1..HEAD}; \
+		out=${2:-diff-da.txt}; \
+		git diff \"$range\" --name-status --find-renames | \
+		sed -E 's/^R[0-9]+[[:space:]]+([^[:space:]]+)[[:space:]]+([^[:space:]]+)$/D\t\\1\\nA\t\\2/' | \
+		sort > \"$out\"; \
+		echo \"Written $range to $out\"; \
+		}; f"
+
+[includeIf "gitdir:~/ginmao-project/"]
+	path = ~/.gitconfig-ginmao

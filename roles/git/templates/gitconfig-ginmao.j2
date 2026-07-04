@@ -1,0 +1,13 @@
+[user]
+    name = {{ git_ginmao_name }}
+    email = {{ git_ginmao_email }}
+
+[pull]
+    rebase = false
+
+[alias]
+    st = status -sb
+    last = log -1 HEAD
+    undo = reset HEAD~1 --mixed
+    amend = commit --amend --no-edit
+    lg = log --oneline --graph --decorate --all
