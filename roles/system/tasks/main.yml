@@ -1,0 +1,46 @@
+---
+- name: Update apt cache
+  become: true
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+
+- name: Install system packages
+  become: true
+  apt:
+    name:
+      - zsh
+      - git
+      - curl
+      - wget
+      - unzip
+      - fonts-powerline
+      - jq
+      - libxml2-utils
+      - build-essential
+      - shellcheck
+      - dos2unix
+      - fontconfig
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install Podman
+  become: true
+  apt:
+    name: podman
+    state: present
+  when: ansible_os_family == "Debian" and install_podman | bool
+
+- name: Check if Bun is installed
+  command: which bun
+  register: bun_check
+  ignore_errors: true
+  changed_when: false
+  when: install_bun | bool
+
+- name: Install Bun for the user
+  shell: curl -fsSL https://bun.sh/install | bash
+  args:
+    creates: "{{ ansible_user_dir }}/.bun/bin/bun"
+  when: install_bun | bool and bun_check.rc != 0

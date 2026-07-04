@@ -1,0 +1,53 @@
+---
+- name: Check if WezTerm config directory exists
+  stat:
+    path: "{{ ansible_user_dir }}/.config/wezterm"
+  register: wezterm_cfg_stat
+
+- name: Backup existing WezTerm config directory (if not a symlink)
+  command: mv "{{ ansible_user_dir }}/.config/wezterm" "{{ ansible_user_dir }}/.config/wezterm.bak"
+  when: wezterm_cfg_stat.stat.exists and not wezterm_cfg_stat.stat.islnk
+
+- name: Remove WezTerm config symlink (if it exists)
+  file:
+    path: "{{ ansible_user_dir }}/.config/wezterm"
+    state: absent
+  when: wezterm_cfg_stat.stat.exists and wezterm_cfg_stat.stat.islnk
+
+- name: Create symlink for WezTerm config
+  file:
+    src: "{{ dotfiles_dest_dir }}/wezterm"
+    dest: "{{ ansible_user_dir }}/.config/wezterm"
+    state: link
+
+
+- name: Check if JetBrainsMono Nerd Font is installed
+  stat:
+    path: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMonoNerdFont-Regular.ttf"
+  register: font_check
+
+- name: Create local fonts directory
+  file:
+    path: "{{ ansible_user_dir }}/.local/share/fonts"
+    state: directory
+    mode: '0755'
+  when: not font_check.stat.exists
+
+- name: Install JetBrainsMono Nerd Font
+  block:
+    - name: Download JetBrainsMono Nerd Font zip
+      get_url:
+        url: https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+        dest: /tmp/JetBrainsMono.zip
+        mode: '0644'
+
+    - name: Unzip JetBrainsMono font to local fonts directory
+      unarchive:
+        src: /tmp/JetBrainsMono.zip
+        dest: "{{ ansible_user_dir }}/.local/share/fonts"
+        remote_src: yes
+
+    - name: Update font cache
+      command: fc-cache -fv
+      changed_when: true
+  when: not font_check.stat.exists

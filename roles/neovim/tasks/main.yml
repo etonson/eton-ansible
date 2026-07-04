@@ -1,0 +1,74 @@
+---
+- name: Check if Neovim command exists
+  command: which nvim
+  register: nvim_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Install Neovim from GitHub release
+  block:
+    - name: Download Neovim release tarball
+      get_url:
+        url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+        dest: /tmp/nvim-linux64.tar.gz
+        mode: '0644'
+
+    - name: Remove old /opt/nvim-linux64 directory if it exists
+      become: true
+      file:
+        path: /opt/nvim-linux64
+        state: absent
+
+    - name: Extract Neovim tarball to /opt
+      become: true
+      unarchive:
+        src: /tmp/nvim-linux64.tar.gz
+        dest: /opt
+        remote_src: yes
+
+    - name: Create symlink in /usr/local/bin
+      become: true
+      file:
+        src: /opt/nvim-linux64/bin/nvim
+        dest: /usr/local/bin/nvim
+        state: link
+  when: nvim_check.rc != 0
+
+- name: Check if Neovim config directory exists
+  stat:
+    path: "{{ nvim_dest_dir }}"
+  register: nvim_cfg_stat
+
+- name: Backup existing Neovim config directory (if not a symlink and not a git repo)
+  block:
+    - name: Check if existing Neovim config is a git repo
+      stat:
+        path: "{{ nvim_dest_dir }}/.git"
+      register: nvim_git_stat
+
+    - name: Backup existing Neovim config
+      command: mv "{{ nvim_dest_dir }}" "{{ nvim_dest_dir }}.bak"
+      when: not nvim_git_stat.stat.exists
+  when: nvim_cfg_stat.stat.exists and not nvim_cfg_stat.stat.islnk
+
+- name: Remove Neovim config symlink (if it exists)
+  file:
+    path: "{{ nvim_dest_dir }}"
+    state: absent
+  when: nvim_cfg_stat.stat.exists and nvim_cfg_stat.stat.islnk
+
+- name: Clone Neovim configuration repository
+  git:
+    repo: "{{ nvim_repo }}"
+    dest: "{{ nvim_dest_dir }}"
+    update: yes
+    accept_hostkey: yes
+
+
+- name: Sync Lazy.nvim plugins
+  command: nvim --headless "+Lazy! sync" +qa
+  changed_when: true
+
+- name: Install Mason tools
+  command: nvim --headless "+MasonToolsInstall" +qa
+  changed_when: true

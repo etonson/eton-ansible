@@ -1,0 +1,92 @@
+---
+- name: Ensure ~/.config directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.config"
+    state: directory
+    mode: '0755'
+
+- name: Clone dotfiles repository
+  git:
+    repo: "{{ dotfiles_repo }}"
+    dest: "{{ dotfiles_dest_dir }}"
+    update: yes
+    accept_hostkey: yes
+
+- name: Check if Zsh config directory exists
+  stat:
+    path: "{{ ansible_user_dir }}/.config/zsh"
+  register: zsh_cfg_stat
+
+- name: Backup existing Zsh config directory (if not a symlink)
+  command: mv "{{ ansible_user_dir }}/.config/zsh" "{{ ansible_user_dir }}/.config/zsh.bak"
+  when: zsh_cfg_stat.stat.exists and not zsh_cfg_stat.stat.islnk
+
+- name: Remove Zsh config symlink (if it exists)
+  file:
+    path: "{{ ansible_user_dir }}/.config/zsh"
+    state: absent
+  when: zsh_cfg_stat.stat.exists and zsh_cfg_stat.stat.islnk
+
+- name: Create symlink for Zsh config
+  file:
+    src: "{{ dotfiles_dest_dir }}/zsh"
+    dest: "{{ ansible_user_dir }}/.config/zsh"
+    state: link
+
+
+- name: Set ZDOTDIR in ~/.zshenv
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.zshenv"
+    line: 'export ZDOTDIR=$HOME/.config/zsh'
+    create: yes
+    state: present
+    mode: '0644'
+
+- name: Clone Oh My Zsh
+  git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "{{ ansible_user_dir }}/.oh-my-zsh"
+    depth: 1
+    update: no
+
+- name: Ensure Oh My Zsh custom directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ zsh_custom_dir }}/themes"
+    - "{{ zsh_custom_dir }}/plugins"
+
+- name: Clone Powerlevel10k theme
+  git:
+    repo: https://github.com/romkatv/powerlevel10k.git
+    dest: "{{ zsh_custom_dir }}/themes/powerlevel10k"
+    depth: 1
+    update: no
+
+- name: Clone zsh-syntax-highlighting plugin
+  git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+    dest: "{{ zsh_custom_dir }}/plugins/zsh-syntax-highlighting"
+    depth: 1
+    update: no
+
+- name: Clone zsh-autosuggestions plugin
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions.git
+    dest: "{{ zsh_custom_dir }}/plugins/zsh-autosuggestions"
+    depth: 1
+    update: no
+
+- name: Find path to zsh
+  command: which zsh
+  register: zsh_path
+  changed_when: false
+
+- name: Set Zsh as default shell for user
+  become: true
+  user:
+    name: "{{ ansible_user_id }}"
+    shell: "{{ zsh_path.stdout }}"
+  when: ansible_env.SHELL != zsh_path.stdout
