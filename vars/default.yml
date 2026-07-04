@@ -13,4 +13,3 @@ zsh_custom_dir: "{{ ansible_user_dir }}/.oh-my-zsh/custom"
 # Install optional runtimes
 install_bun: true
 install_podman: true
-

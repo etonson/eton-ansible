@@ -4,9 +4,12 @@
   connection: local
   vars_files:
     - vars/default.yml
+    - [ "vars/secrets.yml", "vars/secrets.yml.example" ]
 
   roles:
     - role: system
+    - role: git
     - role: zsh
     - role: wezterm
     - role: neovim
+

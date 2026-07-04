@@ -15,9 +15,12 @@ This playbook is designed to fetch the latest configurations directly from remot
 ├── playbook.yml             # Main Ansible playbook
 ├── bootstrap_ansible.sh     # One-click bootstrap script (installs Ansible & runs the playbook)
 ├── vars/
-│   └── default.yml          # Custom variables (GitHub repo URLs, destinations, Bun/Podman flags)
+│   ├── default.yml          # Custom variables (GitHub repo URLs, destinations, Bun/Podman flags)
+│   ├── secrets.yml          # Real personal information (git-ignored, never committed)
+│   └── secrets.yml.example  # Template with placeholders for secrets
 └── roles/
     ├── system/              # System packages & runtimes (APT packages, Podman, Bun)
+    ├── git/                 # Deploys templated .gitconfig & .gitconfig-ginmao securely
     ├── zsh/                 # Clones dotfiles, provisions Zsh, Oh My Zsh framework & plugins
     ├── wezterm/             # Provisions WezTerm config and installs JetBrainsMono Nerd Font
     └── neovim/              # Installs Neovim binary, clones config & headless plugin sync
@@ -33,7 +36,12 @@ This playbook is designed to fetch the latest configurations directly from remot
 * **(Optional)** Installs containerization tool `podman` (can be disabled in `vars/default.yml`).
 * **(Optional)** Installs Bun runtime environment `bun` (can be disabled in `vars/default.yml`).
 
-### 2. `zsh` Role (Zsh & Oh My Zsh)
+### 2. `git` Role (Secure Git Configurations)
+* Deploys `~/.gitconfig` and `~/.gitconfig-ginmao` to the home directory using Jinja2 templates.
+* Supports Git Aliases (e.g., `lg`, `extract`, `savepoint`, `diff-da`) and custom workspace rules (`includeIf` for work directories like `~/ginmao-project/`).
+* Obtains your personal name and email from `vars/secrets.yml` to keep them secure and off public remote repositories.
+
+### 3. `zsh` Role (Zsh & Oh My Zsh)
 * Clones the dotfiles repository `dotfiles_repo` (defaults to `git@github.com:etonson/eton-dotfiles.git`) to `~/.dotfiles`.
 * Automatically backs up existing `~/.config/zsh` directory if it is not a symlink.
 * Creates a symbolic link for `~/.config/zsh` pointing to `~/.dotfiles/zsh` to keep configurations version-controlled.
@@ -42,12 +50,12 @@ This playbook is designed to fetch the latest configurations directly from remot
 * Clones/updates the latest version of the **Powerlevel10k** theme, **zsh-syntax-highlighting**, and **zsh-autosuggestions** plugins.
 * Configures Zsh as the user's default system shell.
 
-### 3. `wezterm` Role (WezTerm & Fonts)
+### 4. `wezterm` Role (WezTerm & Fonts)
 * Automatically backs up existing `~/.config/wezterm` if it is not a symlink.
 * Creates a symbolic link for `~/.config/wezterm` pointing to `~/.dotfiles/wezterm`.
 * Downloads and installs the latest version of **JetBrainsMono Nerd Font** to `~/.local/share/fonts/`, and updates the font cache (`fc-cache`).
 
-### 4. `neovim` Role (Neovim Setup)
+### 5. `neovim` Role (Neovim Setup)
 * Checks if `nvim` is installed. If missing, downloads the latest stable release archive, extracts it to `/opt/nvim-linux64`, and creates a system-wide symlink at `/usr/local/bin/nvim`.
 * Automatically backs up existing `~/.config/nvim` if it is not a Git repository.
 * Clones `nvim_repo` (defaults to `git@github.com:etonson/eton-nvim.git`) directly into `~/.config/nvim`.
@@ -56,7 +64,19 @@ This playbook is designed to fetch the latest configurations directly from remot
 
 ---
 
+## 🔒 Managing Personal Information (Git Config)
+To prevent committing your real name and email address to GitHub, this playbook loads them from a Git-ignored file:
+
+1. Copy `vars/secrets.yml.example` to `vars/secrets.yml`:
+   ```bash
+   cp vars/secrets.yml.example vars/secrets.yml
+   ```
+2. Fill in your real details in `vars/secrets.yml`. Since `.gitignore` is configured to ignore `vars/secrets.yml`, your personal data will never be pushed to your repository.
+
+---
+
 ## 🚀 Quick Start
+
 
 ### Option A: Using the Bootstrap Script (Recommended)
 This script checks if `ansible-playbook` is installed on your system. If not, it will install it via `apt` and then execute the playbook. You will be prompted to enter your `sudo` password for tasks requiring administrator privileges.
