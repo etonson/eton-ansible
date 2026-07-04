@@ -1,0 +1,12 @@
+---
+- name: Set up Professional Development Environment (Dotfiles & Neovim)
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/default.yml
+
+  roles:
+    - role: system
+    - role: zsh
+    - role: wezterm
+    - role: neovim
