@@ -11,6 +11,7 @@
     dest: "{{ dotfiles_dest_dir }}"
     update: yes
     accept_hostkey: yes
+    force: yes
 
 - name: Check if Zsh config directory exists
   stat:

@@ -9,27 +9,27 @@
   block:
     - name: Download Neovim release tarball
       get_url:
-        url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
-        dest: /tmp/nvim-linux64.tar.gz
+        url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+        dest: /tmp/nvim-linux-x86_64.tar.gz
         mode: '0644'
 
-    - name: Remove old /opt/nvim-linux64 directory if it exists
+    - name: Remove old /opt/nvim-linux-x86_64 directory if it exists
       become: true
       file:
-        path: /opt/nvim-linux64
+        path: /opt/nvim-linux-x86_64
         state: absent
 
     - name: Extract Neovim tarball to /opt
       become: true
       unarchive:
-        src: /tmp/nvim-linux64.tar.gz
+        src: /tmp/nvim-linux-x86_64.tar.gz
         dest: /opt
         remote_src: yes
 
     - name: Create symlink in /usr/local/bin
       become: true
       file:
-        src: /opt/nvim-linux64/bin/nvim
+        src: /opt/nvim-linux-x86_64/bin/nvim
         dest: /usr/local/bin/nvim
         state: link
   when: nvim_check.rc != 0
@@ -63,6 +63,7 @@
     dest: "{{ nvim_dest_dir }}"
     update: yes
     accept_hostkey: yes
+    force: yes
 
 
 - name: Sync Lazy.nvim plugins
