@@ -1,0 +1,9 @@
+all:
+  children:
+    localhost:
+      hosts:
+        127.0.0.1:
+    homelabs:
+      hosts:
+        homelab:
+          ansible_become_exe: /usr/bin/sudo.ws

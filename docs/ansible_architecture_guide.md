@@ -11,7 +11,7 @@
 ```mermaid
 graph TD
     %% Playbooks
-    PlaybookLocal[playbook.yml <br>本機入口] -->|讀取| Inventory[inventory.ini <br>主機清單]
+    PlaybookLocal[playbook.yml <br>本機入口] -->|讀取| Inventory[inventory.yml <br>主機清單]
     PlaybookHome[homelab.yml <br>遠端入口] -->|讀取| Inventory
     
     %% Variables
@@ -48,8 +48,8 @@ graph TD
 這部分的檔案定義了「誰在哪裡執行什麼」。
 * **[playbook.yml](file:///home/sixson/eton-ansible/playbook.yml) & [homelab.yml](file:///home/sixson/eton-ansible/homelab.yml)**
   * **看點**：了解 `vars_files` 是如何引入變數的，以及 `roles` 執行的先後順序。您會發現本機多了 `- role: wezterm`。
-* **[inventory.ini](file:///home/sixson/eton-ansible/inventory.ini)**
-  * **看點**：了解 Ansible 如何區分群組（`[localhost]` 與 `[homelabs]`），以及如何為特定主機指定 SSH 參數（例如 `ansible_become_exe`）。
+* **[inventory.yml](file:///home/sixson/eton-ansible/inventory.yml)**
+  * **看點**：了解 Ansible 如何用 YAML 區分群組（`localhost` 與 `homelabs`），以及如何為特定主機指定 SSH 參數（例如 `ansible_become_exe`）。
 * **[ansible.cfg](file:///home/sixson/eton-ansible/ansible.cfg)**
   * **看點**：了解連線優化（`pipelining = True`）與全域逾時（`timeout`）設定。
 

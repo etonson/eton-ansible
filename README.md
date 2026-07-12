@@ -11,7 +11,7 @@ This playbook is designed to fetch the latest configurations directly from remot
 ```text
 /home/sixson/eton-ansible/
 ├── ansible.cfg              # Ansible configuration file
-├── inventory.ini            # Device inventory (defaults to localhost)
+├── inventory.yml            # Device inventory (defaults to localhost)
 ├── playbook.yml             # Main Ansible playbook
 ├── bootstrap_ansible.sh     # One-click bootstrap script (installs Ansible & runs the playbook)
 ├── vars/
