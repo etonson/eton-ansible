@@ -2,3 +2,4 @@ vars/secrets.yml
 *.retry
 .idea/
 .vscode/
+ansible-log.txt
