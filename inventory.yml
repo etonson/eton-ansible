@@ -1,9 +1,11 @@
 all:
-  children:
+  hosts:
     localhost:
-      hosts:
-        127.0.0.1:
+      ansible_connection: local
+      ansible_python_interpreter: /usr/bin/python3
+  children:
     homelabs:
       hosts:
         homelab:
           ansible_become_exe: /usr/bin/sudo.ws
+          ansible_python_interpreter: /usr/bin/python3

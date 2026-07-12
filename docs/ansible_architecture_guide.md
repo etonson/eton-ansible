@@ -11,8 +11,8 @@
 ```mermaid
 graph TD
     %% Playbooks
-    PlaybookLocal[playbook.yml <br>本機入口] -->|讀取| Inventory[inventory.yml <br>主機清單]
-    PlaybookHome[homelab.yml <br>遠端入口] -->|讀取| Inventory
+    PlaybookLocal[playbooks/workspace.yml <br>本機入口] -->|讀取| Inventory[inventory.yml <br>主機清單]
+    PlaybookHome[playbooks/homelab.yml <br>遠端入口] -->|讀取| Inventory
     
     %% Variables
     PlaybookLocal -->|載入變數| Vars[vars/default.yml <br>公開變數]
@@ -46,7 +46,7 @@ graph TD
 
 ### 第一步：入口與核心設定（專案骨架）
 這部分的檔案定義了「誰在哪裡執行什麼」。
-* **[playbook.yml](file:///home/sixson/eton-ansible/playbook.yml) & [homelab.yml](file:///home/sixson/eton-ansible/homelab.yml)**
+* **[workspace.yml](file:///home/sixson/eton-ansible/playbooks/workspace.yml) & [homelab.yml](file:///home/sixson/eton-ansible/playbooks/homelab.yml)**
   * **看點**：了解 `vars_files` 是如何引入變數的，以及 `roles` 執行的先後順序。您會發現本機多了 `- role: wezterm`。
 * **[inventory.yml](file:///home/sixson/eton-ansible/inventory.yml)**
   * **看點**：了解 Ansible 如何用 YAML 區分群組（`localhost` 與 `homelabs`），以及如何為特定主機指定 SSH 參數（例如 `ansible_become_exe`）。

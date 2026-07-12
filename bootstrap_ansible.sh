@@ -26,4 +26,4 @@ fi
 
 # 2. Run Ansible Playbook
 echo -e "${BLUE}🎬 Running Ansible Playbook...${NC}"
-ansible-playbook playbook.yml --ask-become-pass "$@"
+ansible-playbook playbooks/workspace.yml --ask-become-pass "$@"

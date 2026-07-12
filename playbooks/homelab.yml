@@ -1,0 +1,12 @@
+---
+- name: Set up Homelab Server Environment
+  hosts: homelabs
+  vars_files:
+    - ../vars/default.yml
+    - [ "../vars/secrets.yml", "../vars/secrets.yml.example" ]
+
+  roles:
+    - system
+    - git
+    - zsh
+    - neovim

@@ -1,11 +1,10 @@
-Include ~/.ssh/company/*.conf
-
 # GitHub
 Host github.com
     HostName github.com
     User git
     IdentityFile {{ ssh_github_identity_file }}
 
+# Homelab
 Host homelab
     HostName {{ ssh_homelab_hostname }}
     User {{ ssh_homelab_user }}

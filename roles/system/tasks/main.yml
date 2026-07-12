@@ -51,9 +51,36 @@
     state: directory
     mode: '0700'
 
-- name: Deploy SSH config
-  template:
-    src: ssh_config.j2
-    dest: "{{ ansible_user_dir }}/.ssh/config"
+- name: Ensure .ssh config include directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.ssh/config.d"
+    state: directory
+    mode: '0700'
+
+- name: Ensure .ssh company include directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.ssh/company"
+    state: directory
+    mode: '0700'
+
+- name: Ensure SSH config includes managed snippets
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.ssh/config"
+    line: "Include ~/.ssh/config.d/*.conf"
+    insertbefore: BOF
+    create: true
     mode: '0600'
 
+- name: Ensure SSH config includes company snippets
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.ssh/config"
+    line: "Include ~/.ssh/company/*.conf"
+    insertafter: "^Include ~/.ssh/config.d/\\*.conf$"
+    create: true
+    mode: '0600'
+
+- name: Deploy project SSH config snippet
+  template:
+    src: ssh_config_eton_ansible.j2
+    dest: "{{ ansible_user_dir }}/.ssh/config.d/eton-ansible.conf"
+    mode: '0600'

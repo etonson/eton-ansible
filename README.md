@@ -12,7 +12,9 @@ This playbook is designed to fetch the latest configurations directly from remot
 /home/sixson/eton-ansible/
 ├── ansible.cfg              # Ansible configuration file
 ├── inventory.yml            # Device inventory (defaults to localhost)
-├── playbook.yml             # Main Ansible playbook
+├── playbooks/
+│   ├── workspace.yml        # Local workstation playbook
+│   └── homelab.yml          # Homelab server playbook
 ├── bootstrap_ansible.sh     # One-click bootstrap script (installs Ansible & runs the playbook)
 ├── vars/
 │   ├── default.yml          # Custom variables (GitHub repo URLs, destinations, Bun/Podman flags)
@@ -90,7 +92,7 @@ This script checks if `ansible-playbook` is installed on your system. If not, it
 If you already have Ansible installed, you can trigger the playbook directly:
 
 ```bash
-ansible-playbook playbook.yml --ask-become-pass
+ansible-playbook playbooks/workspace.yml --ask-become-pass
 ```
 
 ---
