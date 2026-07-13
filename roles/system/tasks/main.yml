@@ -29,7 +29,9 @@
 - name: Install Podman
   become: true
   apt:
-    name: podman
+    name:
+      - podman
+      - podman-compose
     state: present
   when: ansible_os_family == "Debian" and install_podman | bool
 

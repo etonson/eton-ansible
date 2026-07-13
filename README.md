@@ -35,7 +35,7 @@ This playbook is designed to fetch the latest configurations directly from remot
 ### 1. `system` Role (System Dependencies)
 * Updates `apt` cache.
 * Installs core developer utility packages: `zsh`, `git`, `curl`, `wget`, `unzip`, `fonts-powerline`, `jq`, `libxml2-utils`, `build-essential`, `shellcheck`, `dos2unix`, `fontconfig`.
-* **(Optional)** Installs containerization tool `podman` (can be disabled in `vars/default.yml`).
+* **(Optional)** Installs containerization tools `podman` and `podman-compose` (can be disabled in `vars/default.yml`).
 * **(Optional)** Installs Bun runtime environment `bun` (can be disabled in `vars/default.yml`).
 
 ### 2. `git` Role (Secure Git Configurations)
