@@ -1,0 +1,11 @@
+---
+# Create the real encrypted file with: ansible-vault create vars/vault.yml
+# Commit only the encrypted vault file. Never commit plaintext private keys.
+ssh_private_keys: []
+# ssh_private_keys:
+#   - name: id_ed25519
+#     content: |
+#       -----BEGIN OPENSSH PRIVATE KEY-----
+#       ...
+#       -----END OPENSSH PRIVATE KEY-----
+#     mode: "0600"

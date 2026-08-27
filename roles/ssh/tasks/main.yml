@@ -1,0 +1,33 @@
+---
+- name: Validate private key destination names
+  ansible.builtin.assert:
+    that:
+      - item.name == (item.name | basename)
+      - item.name is match('^[A-Za-z0-9._-]+$')
+    fail_msg: "SSH key name must be a plain filename"
+  loop: "{{ ssh_private_keys }}"
+  loop_control:
+    label: "{{ item.name }}"
+  no_log: true
+
+- name: Restore encrypted SSH private keys
+  ansible.builtin.copy:
+    content: "{{ item.content }}"
+    dest: "{{ ansible_user_dir }}/.ssh/{{ item.name }}"
+    mode: "{{ item.mode | default('0600') }}"
+  loop: "{{ ssh_private_keys }}"
+  loop_control:
+    label: "{{ item.name }}"
+  no_log: true
+
+- name: Check GitHub SSH identity
+  ansible.builtin.stat:
+    path: "{{ ssh_github_identity_file | replace('~', ansible_user_dir) }}"
+  register: github_identity
+
+- name: Require GitHub identity before SSH repository checkout
+  ansible.builtin.assert:
+    that: github_identity.stat.exists
+    fail_msg: >-
+      Missing {{ ssh_github_identity_file }}. Restore it through encrypted
+      vars/vault.yml or install it before running this playbook.

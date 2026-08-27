@@ -36,17 +36,18 @@
   when: ansible_os_family == "Debian" and install_podman | bool
 
 - name: Check if Bun is installed
-  command: which bun
+  command: bun --version
   register: bun_check
   ignore_errors: true
   changed_when: false
   when: install_bun | bool
 
 - name: Install Bun for the user
-  shell: curl -fsSL https://bun.sh/install | bash
-  args:
-    creates: "{{ ansible_user_dir }}/.bun/bin/bun"
-  when: install_bun | bool and bun_check.rc != 0
+  shell: >-
+    curl -fsSL https://bun.com/install | bash -s "bun-v{{ bun_version }}"
+  when: >-
+    install_bun | bool and
+    (bun_check.rc != 0 or bun_check.stdout != bun_version)
 
 - name: Ensure .ssh directory exists
   file:

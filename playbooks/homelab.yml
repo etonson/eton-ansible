@@ -4,9 +4,11 @@
   vars_files:
     - ../vars/default.yml
     - [ "../vars/secrets.yml", "../vars/secrets.yml.example" ]
+    - [ "../vars/vault.yml", "../vars/vault.yml.example" ]
 
   roles:
     - system
+    - ssh
     - git
     - zsh
     - neovim

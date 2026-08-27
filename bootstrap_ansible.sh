@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+REPO_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+cd "$REPO_DIR"
 
 # ANSI escape codes for coloring
 GREEN='\033[0;32m'
@@ -26,4 +29,8 @@ fi
 
 # 2. Run Ansible Playbook
 echo -e "${BLUE}🎬 Running Ansible Playbook...${NC}"
-ansible-playbook playbooks/workspace.yml --ask-become-pass "$@"
+VAULT_ARGS=()
+if [[ -f vars/vault.yml ]] && head -n 1 vars/vault.yml | grep -q '^\$ANSIBLE_VAULT;'; then
+    VAULT_ARGS=(--ask-vault-pass)
+fi
+ansible-playbook playbooks/workspace.yml --ask-become-pass "${VAULT_ARGS[@]}" "$@"

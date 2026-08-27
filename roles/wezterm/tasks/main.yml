@@ -5,20 +5,17 @@
   register: wezterm_cfg_stat
 
 - name: Backup existing WezTerm config directory (if not a symlink)
-  command: mv "{{ ansible_user_dir }}/.config/wezterm" "{{ ansible_user_dir }}/.config/wezterm.bak"
+  command: >-
+    mv {{ ansible_user_dir }}/.config/wezterm
+    {{ ansible_user_dir }}/.config/wezterm.bak-{{ ansible_date_time.iso8601_basic_short }}
   when: wezterm_cfg_stat.stat.exists and not wezterm_cfg_stat.stat.islnk
-
-- name: Remove WezTerm config symlink (if it exists)
-  file:
-    path: "{{ ansible_user_dir }}/.config/wezterm"
-    state: absent
-  when: wezterm_cfg_stat.stat.exists and wezterm_cfg_stat.stat.islnk
 
 - name: Create symlink for WezTerm config
   file:
     src: "{{ dotfiles_dest_dir }}/wezterm"
     dest: "{{ ansible_user_dir }}/.config/wezterm"
     state: link
+    force: true
 
 
 - name: Check if JetBrainsMono Nerd Font is installed
@@ -37,7 +34,7 @@
   block:
     - name: Download JetBrainsMono Nerd Font zip
       get_url:
-        url: https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ nerd_font_version }}/JetBrainsMono.zip"
         dest: /tmp/JetBrainsMono.zip
         mode: '0644'
 

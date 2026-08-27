@@ -2,13 +2,24 @@
 # Git repositories (GitHub SSH URLs)
 dotfiles_repo: "git@github.com:etonson/eton-dotfiles.git"
 nvim_repo: "git@github.com:etonson/eton-nvim.git"
+dotfiles_version: "a3b4a8e62bb0e6f435abc84464cff23b0c77b1ab"
+nvim_version: "30ad4467786c7bead6379ffddbcfdb7267dedb03"
 
 # Local destinations
-dotfiles_dest_dir: "{{ ansible_user_dir }}/.dotfiles"
+dotfiles_dest_dir: "{{ ansible_user_dir }}/eton-dotfiles"
 nvim_dest_dir: "{{ ansible_user_dir }}/.config/nvim"
+srv_config_dir: "{{ ansible_user_dir }}/company/remote-file"
 
 # Zsh settings
 zsh_custom_dir: "{{ ansible_user_dir }}/.oh-my-zsh/custom"
+oh_my_zsh_version: "97e11051e2f8053b1d694788d1cb4b0dbb1e2365"
+powerlevel10k_version: "8ed1f58e082e1cce85e1d69235d1a906cf3c643e"
+zsh_syntax_highlighting_version: "1d85c692615a25fe2293bdd44b34c217d5d2bf04"
+zsh_autosuggestions_version: "85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5"
+neovim_version: "v0.11.4"
+nerd_font_version: "v3.4.0"
+bun_version: "1.3.14"
+ssh_private_keys: []
 
 # Install optional runtimes
 install_bun: true

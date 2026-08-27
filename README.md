@@ -17,7 +17,7 @@ This playbook is designed to fetch the latest configurations directly from remot
 │   └── homelab.yml          # Homelab server playbook
 ├── bootstrap_ansible.sh     # One-click bootstrap script (installs Ansible & runs the playbook)
 ├── vars/
-│   ├── default.yml          # Custom variables (GitHub repo URLs, destinations, Bun/Podman flags)
+│   ├── default.yml          # Version locks, repository URLs, destinations, feature flags
 │   ├── secrets.yml          # Real personal information (git-ignored, never committed)
 │   └── secrets.yml.example  # Template with placeholders for secrets
 └── roles/
@@ -103,3 +103,25 @@ To customize your installation, modify [vars/default.yml](file:///home/sixson/et
 * `install_bun`: Set to `true` or `false` to toggle the installation of Bun.
 * `install_podman`: Set to `true` or `false` to toggle the installation of Podman.
 * `dotfiles_repo` & `nvim_repo`: Set to customize your Git remote source URLs.
+
+## Restoring SSH identities
+
+Private keys are restored before any SSH-based Git checkout. Store them only in
+an encrypted Ansible Vault file:
+
+```bash
+cp vars/vault.yml.example /tmp/vault-template.yml
+ansible-vault create vars/vault.yml
+```
+
+Use the structure from the template, then commit the encrypted `vars/vault.yml`.
+The bootstrap script detects an encrypted vault and asks for its password. It
+never prints key contents (`no_log: true`). If no vault is configured, the
+required GitHub identity must already exist on the machine.
+
+## Reproducible versions
+
+Repository commits and downloaded release tags are centralized in
+`vars/default.yml`. Upgrade them deliberately instead of following `latest`.
+After publishing a dotfiles change, update `dotfiles_version` to its deployed
+commit SHA so restoration remains reproducible.

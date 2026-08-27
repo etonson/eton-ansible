@@ -1,6 +1,6 @@
 ---
 - name: Check if Neovim command exists
-  command: which nvim
+  command: nvim --version
   register: nvim_check
   ignore_errors: true
   changed_when: false
@@ -9,7 +9,7 @@
   block:
     - name: Download Neovim release tarball
       get_url:
-        url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+        url: "https://github.com/neovim/neovim/releases/download/{{ neovim_version }}/nvim-linux-x86_64.tar.gz"
         dest: /tmp/nvim-linux-x86_64.tar.gz
         mode: '0644'
 
@@ -32,7 +32,7 @@
         src: /opt/nvim-linux-x86_64/bin/nvim
         dest: /usr/local/bin/nvim
         state: link
-  when: nvim_check.rc != 0
+  when: nvim_check.rc != 0 or neovim_version not in nvim_check.stdout
 
 - name: Check if Neovim config directory exists
   stat:
@@ -47,7 +47,9 @@
       register: nvim_git_stat
 
     - name: Backup existing Neovim config
-      command: mv "{{ nvim_dest_dir }}" "{{ nvim_dest_dir }}.bak"
+      command: >-
+        mv {{ nvim_dest_dir }}
+        {{ nvim_dest_dir }}.bak-{{ ansible_date_time.iso8601_basic_short }}
       when: not nvim_git_stat.stat.exists
   when: nvim_cfg_stat.stat.exists and not nvim_cfg_stat.stat.islnk
 
@@ -61,15 +63,16 @@
   git:
     repo: "{{ nvim_repo }}"
     dest: "{{ nvim_dest_dir }}"
-    update: yes
+    version: "{{ nvim_version }}"
+    update: true
     accept_hostkey: yes
-    force: yes
+    force: false
 
 
 - name: Sync Lazy.nvim plugins
   command: nvim --headless "+Lazy! sync" +qa
-  changed_when: true
+  changed_when: false
 
 - name: Install Mason tools
   command: nvim --headless "+MasonToolsInstall" +qa
-  changed_when: true
+  changed_when: false
