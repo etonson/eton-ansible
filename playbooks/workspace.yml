@@ -13,4 +13,5 @@
     - zsh
     - local_scripts
     - wezterm
+    - desktop
     - neovim

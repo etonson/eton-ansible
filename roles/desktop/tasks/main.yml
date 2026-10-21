@@ -1,0 +1,62 @@
+---
+- name: Clone desktop appearance repository
+  git:
+    repo: "{{ desktop_repo }}"
+    dest: "{{ desktop_dest_dir }}"
+    version: "{{ desktop_version }}"
+    update: true
+    accept_hostkey: yes
+    force: false
+
+# eton-desktop writes GSettings over the session bus, so it only works from a
+# terminal inside the GNOME session. Elsewhere, skip it instead of failing.
+- name: Check for a GNOME desktop session
+  set_fact:
+    desktop_session_ready: >-
+      {{ 'GNOME' in (ansible_env.XDG_CURRENT_DESKTOP | default(''))
+         and (ansible_env.DBUS_SESSION_BUS_ADDRESS | default('')) | length > 0 }}
+
+- name: Report skipped desktop appearance
+  debug:
+    msg: >-
+      No GNOME session detected; skipped. Rerun the playbook from a terminal
+      inside GNOME to apply the desktop appearance.
+  when: not desktop_session_ready
+
+- name: Apply desktop appearance
+  when: desktop_session_ready
+  block:
+    - name: Check if Tela-dark icons are installed
+      stat:
+        path: "{{ ansible_user_dir }}/.local/share/icons/Tela-dark/index.theme"
+      register: desktop_tela
+
+    - name: Read pinned Blur my Shell version
+      slurp:
+        src: "{{ desktop_dest_dir }}/config/sources.json"
+      register: desktop_sources
+
+    - name: Read installed Blur my Shell metadata
+      slurp:
+        src: "{{ ansible_user_dir }}/.local/share/gnome-shell/extensions/blur-my-shell@aunetx/metadata.json"
+      register: desktop_extension
+      failed_when: false
+
+    - name: Decide whether assets need installing
+      set_fact:
+        desktop_assets_current: >-
+          {{ desktop_tela.stat.exists
+             and desktop_extension.content is defined
+             and (desktop_extension.content | b64decode | from_json).version
+                 == (desktop_sources.content | b64decode | from_json).blur_my_shell.version }}
+
+    - name: Install icons and Blur my Shell, then apply the profile
+      command: "{{ desktop_dest_dir }}/scripts/install.sh"
+      changed_when: true
+      when: not desktop_assets_current
+
+    - name: Apply the desktop profile
+      command: "{{ desktop_dest_dir }}/scripts/settings.py apply"
+      register: desktop_apply
+      changed_when: "'Already up to date.' not in desktop_apply.stdout"
+      when: desktop_assets_current

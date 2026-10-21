@@ -2,12 +2,15 @@
 # Git repositories (GitHub SSH URLs)
 dotfiles_repo: "git@github.com:etonson/eton-dotfiles.git"
 nvim_repo: "git@github.com:etonson/eton-nvim.git"
-dotfiles_version: "be5d87b1c838bce35afdd3ca4bf27794f92a9688"
+desktop_repo: "git@github.com:etonson/eton-desktop.git"
+dotfiles_version: "bfd9c8284c9ea42de40eeacdbfc5f8a9f0dbce94"
 nvim_version: "30ad4467786c7bead6379ffddbcfdb7267dedb03"
+desktop_version: "68ac92c6fddf2d8c26ea17ab4a40cedc20ab9869"
 
 # Local destinations
 dotfiles_dest_dir: "{{ ansible_user_dir }}/eton-dotfiles"
 nvim_dest_dir: "{{ ansible_user_dir }}/.config/nvim"
+desktop_dest_dir: "{{ ansible_user_dir }}/eton-desktop"
 srv_config_dir: "{{ ansible_user_dir }}/company/remote-file"
 
 # Zsh settings

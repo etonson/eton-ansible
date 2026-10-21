@@ -25,6 +25,7 @@ This playbook is designed to fetch the latest configurations directly from remot
     ├── git/                 # Deploys templated .gitconfig & .gitconfig-ginmao securely
     ├── zsh/                 # Clones dotfiles, provisions Zsh, Oh My Zsh framework & plugins
     ├── wezterm/             # Provisions WezTerm config and installs JetBrainsMono Nerd Font
+    ├── desktop/             # Deploys eton-desktop (GNOME frosted-glass appearance), workspace only
     └── neovim/              # Installs Neovim binary, clones config & headless plugin sync
 ```
 
@@ -57,7 +58,13 @@ This playbook is designed to fetch the latest configurations directly from remot
 * Creates a symbolic link for `~/.config/wezterm` pointing to `~/.dotfiles/wezterm`.
 * Downloads and installs the latest version of **JetBrainsMono Nerd Font** to `~/.local/share/fonts/`, and updates the font cache (`fc-cache`).
 
-### 5. `neovim` Role (Neovim Setup)
+### 5. `desktop` Role (GNOME Appearance, workspace only)
+* Clones `desktop_repo` (`git@github.com:etonson/eton-desktop.git`) to `~/eton-desktop` at the pinned `desktop_version`.
+* Runs `scripts/install.sh` when the Tela-dark icons are missing or the installed Blur my Shell version differs from the repo's `config/sources.json`; otherwise runs only `scripts/settings.py apply`, which reports no change when the desktop already matches the profile.
+* Needs a terminal inside the GNOME session (session D-Bus). Without one, the role prints a message and skips instead of failing.
+* Not included in `playbooks/homelab.yml`.
+
+### 6. `neovim` Role (Neovim Setup)
 * Checks if `nvim` is installed. If missing, downloads the latest stable release archive, extracts it to `/opt/nvim-linux64`, and creates a system-wide symlink at `/usr/local/bin/nvim`.
 * Automatically backs up existing `~/.config/nvim` if it is not a Git repository.
 * Clones `nvim_repo` (defaults to `git@github.com:etonson/eton-nvim.git`) directly into `~/.config/nvim`.
@@ -143,3 +150,4 @@ Repository commits and downloaded release tags are centralized in
 `vars/default.yml`. Upgrade them deliberately instead of following `latest`.
 After publishing a dotfiles change, update `dotfiles_version` to its deployed
 commit SHA so restoration remains reproducible.
+Do the same with `desktop_version` after pushing an eton-desktop change.
