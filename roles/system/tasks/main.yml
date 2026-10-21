@@ -61,9 +61,15 @@
     state: directory
     mode: "0700"
 
+- name: Rename .ssh company include directory to company.d
+  command: mv "{{ ansible_user_dir }}/.ssh/company" "{{ ansible_user_dir }}/.ssh/company.d"
+  args:
+    removes: "{{ ansible_user_dir }}/.ssh/company"
+    creates: "{{ ansible_user_dir }}/.ssh/company.d"
+
 - name: Ensure .ssh company include directory exists
   file:
-    path: "{{ ansible_user_dir }}/.ssh/company"
+    path: "{{ ansible_user_dir }}/.ssh/company.d"
     state: directory
     mode: "0700"
 
@@ -78,7 +84,8 @@
 - name: Ensure SSH config includes company snippets
   lineinfile:
     path: "{{ ansible_user_dir }}/.ssh/config"
-    line: "Include ~/.ssh/company/*.conf"
+    regexp: "^Include ~/.ssh/company(\\.d)?/\\*\\.conf$"
+    line: "Include ~/.ssh/company.d/*.conf"
     insertafter: "^Include ~/.ssh/config.d/\\*.conf$"
     create: true
     mode: "0600"
