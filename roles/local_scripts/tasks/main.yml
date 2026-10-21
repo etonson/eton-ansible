@@ -1,0 +1,50 @@
+---
+- name: Install custom script dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - subversion
+      - power-profiles-daemon
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Ensure system local bin directory exists
+  become: true
+  ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy versioned custom scripts from target dotfiles checkout
+  become: true
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dest_dir }}/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0755'
+    backup: true
+  loop:
+    - extract-commit
+    - svn-legacy
+    - quiet-dev
+    - focus-build
+    - full-power
+    - system-default
+
+- name: Ensure user OpenSSL configuration directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.config/openssl"
+    state: directory
+    mode: '0755'
+
+- name: Deploy OpenSSL configuration used only by svn-legacy
+  ansible.builtin.copy:
+    src: "{{ dotfiles_dest_dir }}/openssl/svn-legacy.cnf"
+    dest: "{{ ansible_user_dir }}/.config/openssl/svn-legacy.cnf"
+    remote_src: true
+    mode: '0644'
+    backup: true

@@ -2,7 +2,7 @@
 # Git repositories (GitHub SSH URLs)
 dotfiles_repo: "git@github.com:etonson/eton-dotfiles.git"
 nvim_repo: "git@github.com:etonson/eton-nvim.git"
-dotfiles_version: "a3b4a8e62bb0e6f435abc84464cff23b0c77b1ab"
+dotfiles_version: "be5d87b1c838bce35afdd3ca4bf27794f92a9688"
 nvim_version: "30ad4467786c7bead6379ffddbcfdb7267dedb03"
 
 # Local destinations

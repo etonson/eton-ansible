@@ -119,6 +119,24 @@ The bootstrap script detects an encrypted vault and asks for its password. It
 never prints key contents (`no_log: true`). If no vault is configured, the
 required GitHub identity must already exist on the machine.
 
+## Custom workstation scripts
+
+Run `./bootstrap_ansible.sh` to deploy the workspace, including the six
+custom scripts versioned in `eton-dotfiles/bin/`. The `local_scripts` role
+runs after the dotfiles checkout, installs Subversion and power-profiles-daemon
+on Debian systems, and copies an explicit list of scripts to `/usr/local/bin`
+with owner `root:root` and mode `0755`. Existing changed files are backed up.
+It also deploys the user-scoped OpenSSL configuration for `svn-legacy`.
+It does not execute the power commands during deployment.
+
+`playbooks/homelab.yml` does not include this role, so it skips these scripts
+and their associated dependencies/configuration. Existing files are left alone.
+Installed binaries and package links are not collected from `/usr/local/bin`.
+
+After editing scripts, commit and push dotfiles first, then update
+`dotfiles_version` in `vars/default.yml` to that commit before deploying.
+The standalone dotfiles bootstrap does not install these system commands.
+
 ## Reproducible versions
 
 Repository commits and downloaded release tags are centralized in

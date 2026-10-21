@@ -11,5 +11,6 @@
     - ssh
     - git
     - zsh
+    - local_scripts
     - wezterm
     - neovim
